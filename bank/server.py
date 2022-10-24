@@ -1,9 +1,18 @@
 from sanic import Sanic
-from sanic.response import text
 
-app = Sanic("MyApp")
+from bank.endpoints import user_blueprint
 
 
-@app.get("/")
-async def hello_world(request):
-    return text("Hello, world.")
+def create_app() -> Sanic:
+    application = Sanic("MyApp")
+    application.config.update({
+        "DB_HOST": "localhost",
+        "DB_NAME": "postgres",
+        "DB_USER": "user",
+        "DB_PASSWORD": "hackme",
+    })
+    application.blueprint(user_blueprint)
+    return application
+
+
+app = create_app()

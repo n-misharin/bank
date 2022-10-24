@@ -35,3 +35,10 @@ class User(Base):
         Enum(UserRoleEnum),
         nullable=False,
     )
+
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "login": self.login,
+            "role": str(self.role.value),
+        }

@@ -9,14 +9,14 @@ async def index(request: Request) -> HTTPResponse:
 
 
 @bp.post("/auth")
-async def login(request: Request) -> HTTPResponse:
+async def auth(request: Request) -> HTTPResponse:
     return json({
         "token": None,
     })
 
 
 @bp.post("/registration")
-async def login(request: Request) -> HTTPResponse:
+async def registration(request: Request) -> HTTPResponse:
     return json({
 
     })

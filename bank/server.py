@@ -4,17 +4,14 @@ from sanic import Sanic, Request
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
+from bank.config.config import DefaultConfig
 from bank.endpoints import user_blueprint
 
 
 def create_app() -> Sanic:
-    application = Sanic("MyApp")
-    application.config.update({
-        "DB_HOST": "localhost",
-        "DB_NAME": "postgres",
-        "DB_USER": "user",
-        "DB_PASSWORD": "hackme",
-    })
+    application = Sanic("MyApp", config=DefaultConfig())
+
+    # TODO: вынести строку подключения
     bind = create_async_engine("postgresql+asyncpg://user:hackme@localhost:5432/postgres")
     _sessionmaker = sessionmaker(bind, AsyncSession, expire_on_commit=False)
     _base_model_session_ctx = ContextVar("session")

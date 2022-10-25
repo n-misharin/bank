@@ -1,8 +1,14 @@
+import datetime
+
+import jwt
 from sanic import text, Request, HTTPResponse, Blueprint, json
+from sanic_ext import validate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bank.db.models import User
+from bank.middleware.auth import protected
+from bank.schemas.auth.registration import RegistrationUserForm
 
 bp = Blueprint("user")
 
@@ -17,14 +23,19 @@ async def index(request: Request) -> HTTPResponse:
 
 
 @bp.post("/auth")
+@protected
 async def auth(request: Request) -> HTTPResponse:
     return json({
-        "token": None,
+        "token": request.token,
     })
 
 
 @bp.post("/registration")
-async def registration(request: Request) -> HTTPResponse:
+@validate(json=RegistrationUserForm)
+async def registration(request: Request, body: RegistrationUserForm) -> HTTPResponse:
     return json({
-
+        "token": jwt.encode({
+            "user": "nd-misharin1",
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=2),
+        }, request.app.config.SECRET)
     })

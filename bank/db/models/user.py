@@ -37,6 +37,7 @@ class User(Base):
     )
 
     def to_dict(self):
+        # TODO:
         return {
             "id": str(self.id),
             "login": self.login,

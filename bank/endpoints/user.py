@@ -1,3 +1,4 @@
+import base64
 import datetime
 
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
@@ -28,6 +29,7 @@ async def index(request: Request) -> HTTPResponse:
 @bp.post("/authentication")
 @validate(json=UserAuthenticationRequest)
 async def auth(request: Request, body: UserAuthenticationRequest) -> HTTPResponse:
+    # TODO: May be Base Auth?
     user = await authenticate_user(request.ctx.session, body.username, body.password)
     if not user:
         raise exceptions.Unauthorized("Invalid username or password.")

@@ -1,10 +1,9 @@
 import enum
 
-from sqlalchemy import Column, TEXT, Enum, BOOLEAN
+from sqlalchemy import Column, String, Enum, BOOLEAN, TEXT
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from bank.config.config import DefaultConfig
 from bank.db import Base
 
 
@@ -25,7 +24,7 @@ class User(Base):
 
     username = Column(
         "username",
-        TEXT,
+        String(50),
         unique=True,
         index=True,
         nullable=False,

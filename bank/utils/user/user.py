@@ -22,6 +22,7 @@ def verify_password(plain_password: str, hash_password: str) -> bool:
 
 
 async def authenticate_user(session: AsyncSession, username: str, password: str) -> User | None:
+    # TODO: What to do for not confirmed user?
     user = await get_user(session, username)
     if not user:
         return None
@@ -39,7 +40,7 @@ async def register_user(session: AsyncSession, username: str, password: str) -> 
 
 
 def check_token(token: str) -> tuple[bool, dict | None]:
-    if not token:
+    if token is None:
         return False, None
 
     try:
@@ -53,9 +54,10 @@ def check_token(token: str) -> tuple[bool, dict | None]:
 async def get_current_user(session: AsyncSession, token: str) -> User:
     is_valid, decode_result = check_token(token)
     if not is_valid or decode_result is None:
-        raise exceptions.Unauthorized("Could not validate credentials.")
+        raise exceptions.Unauthorized(f"Could not validate credentials.")
 
-    user_login = decode_result.get("username", default=None)
+    user_login = decode_result.get("username", None)
+
     if user_login is None:
         raise exceptions.Unauthorized("Could not validate credentials.")
 
@@ -70,7 +72,8 @@ def protected(wrapped):
     def decorator(func):
         @wraps(func)
         async def decorated_function(request: Request, *args, **kwargs):
-            if check_token(request.token):
+            is_correct, _ = check_token(request.token)
+            if is_correct:
                 return await func(request, *args, **kwargs)
 
             raise exceptions.Unauthorized("Auth required.")

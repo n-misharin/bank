@@ -38,3 +38,6 @@ revision:
 
 migrate:
 	cd $(APPLICATION_NAME)/db && alembic upgrade head
+
+downgrade:
+	cd $(APPLICATION_NAME)/db && alembic downgrade

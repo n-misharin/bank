@@ -12,7 +12,15 @@ class BaseInvalidDataError(Exception):
     pass
 
 
-class InsufficientFundsError(Exception):
+class InsufficientFundsError(BaseInvalidDataError):
+    pass
+
+
+class InvalidProductError(BaseInvalidDataError):
+    pass
+
+
+class InvalidOwnerError(BaseInvalidDataError):
     pass
 
 
@@ -48,3 +56,9 @@ async def get_bills_by_user_id(session: AsyncSession, user_id: UUID) -> list[Bil
     query = select(Bill).where(Bill.owner_id == user_id)
     result = await session.scalars(query)
     return [bill for bill in result.all()]
+
+
+async def get_bill_history(session: AsyncSession, bill_id: UUID) -> list[Transaction]:
+    query = select(Transaction).where(Transaction.bill_id == bill_id)
+    result = await session.scalars(query)
+    return [transaction for transaction in result.all()]

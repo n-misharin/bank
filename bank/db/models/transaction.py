@@ -26,3 +26,10 @@ class Transaction(Base):
         ForeignKey("bills.id"),
         nullable=False,
     )
+
+    def to_dict(self) -> dict:
+        return {
+            "id": str(self.id),
+            "amount": str(self.amount),
+            "bill_id": str(self.bill_id),
+        }

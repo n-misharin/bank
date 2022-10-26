@@ -1,29 +1,16 @@
-import base64
 import datetime
 
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from sanic import Request, HTTPResponse, Blueprint, json, exceptions
 from sanic_ext import validate
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from bank.config.config import DefaultConfig
-from bank.db.models import User
 from bank.schemas.auth.authentication import UserAuthenticationRequest, UserAuthenticationResponse
 from bank.schemas.auth.registration import UserRegistrationRequest, UserRegistrationResponse
 from bank.utils.user.user import authenticate_user, create_token, register_user
 
 
 bp = Blueprint("user")
-
-
-@bp.get("/")
-async def index(request: Request) -> HTTPResponse:
-    session: AsyncSession = request.ctx.session
-    async with session.begin():
-        stmt = select(User)
-        result = await session.execute(stmt)
-    return json(result.scalar().to_dict())
 
 
 @bp.post("/authentication")

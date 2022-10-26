@@ -3,16 +3,8 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bank.utils.biil.bill import write_off
-from bank.utils.biil.database import get_bill, BaseInvalidDataError, InvalidBillError
+from bank.utils.biil.database import get_bill, InvalidBillError, InvalidOwnerError, InvalidProductError
 from bank.utils.products.database import get_product
-
-
-class InvalidProductError(BaseInvalidDataError):
-    pass
-
-
-class InvalidOwnerError(BaseInvalidDataError):
-    pass
 
 
 async def buy_product(

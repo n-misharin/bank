@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import select, exc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,6 +8,11 @@ from bank.db.models import User
 
 async def get_user(session: AsyncSession, username: str) -> User | None:
     query = select(User).where(User.username == username)
+    return await session.scalar(query)
+
+
+async def get_user_by_id(session: AsyncSession, user_id: UUID) -> User | None:
+    query = select(User).where(User.id == user_id)
     return await session.scalar(query)
 
 

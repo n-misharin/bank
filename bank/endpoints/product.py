@@ -31,9 +31,9 @@ async def buy(request: Request, body: BuyProductRequest) -> HTTPResponse:
     cur_user: User = request.ctx.cur_user
     try:
         await buy_product(request.ctx.session, body.product_id, body.bill_id, cur_user.id)
-    except BaseInvalidDataError as exc:
-        raise exceptions.BadRequest(str(exc))
     except InsufficientFundsError as exc:
+        raise exceptions.BadRequest(str(exc))
+    except BaseInvalidDataError as exc:
         raise exceptions.BadRequest(str(exc))
     response = BuyProductResponse(message="Accepted.")
 

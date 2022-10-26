@@ -2,7 +2,7 @@ from sanic import Request, HTTPResponse, Blueprint, json, exceptions
 from sanic_ext import validate
 
 from bank.db.models import User
-from bank.schemas.product.buy_product import BuyProductRequest, BuyProductResponse
+from bank.schemas.product.products import BuyProductRequest, BuyProductResponse
 from bank.utils.biil.database import BaseInvalidDataError, InsufficientFundsError
 from bank.utils.products.database import get_all_products
 from bank.utils.products.products import buy_product
@@ -15,6 +15,7 @@ bp = Blueprint("product")
 @protected
 async def get_products(request: Request) -> HTTPResponse:
     products = await get_all_products(request.ctx.session)
+
     return json({
         "items": [
             product.to_dict()

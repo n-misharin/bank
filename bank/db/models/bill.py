@@ -31,3 +31,10 @@ class Bill(Base):
         ForeignKey("users.id"),
         nullable=False,
     )
+
+    def to_dict(self) -> dict:
+        return {
+            "id": str(self.id),
+            "balance": str(self.balance),
+            "owner_id": str(self.owner_id)
+        }

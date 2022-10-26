@@ -19,7 +19,7 @@ class DefaultConfig(Config):
 
     PWD_CONTEXT: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
     JWT_ALGORITHM: str = "HS256"
-    CONFIRM_TOKEN_EXPIRE_MINUTES: int = 0
+    CONFIRM_TOKEN_EXPIRE_MINUTES: int = 5
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
 
     DEBUG: bool = True

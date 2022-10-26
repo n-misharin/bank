@@ -1,8 +1,6 @@
 import datetime
 
-import jwt
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
-from pydantic import HttpUrl
 from sanic import Request, HTTPResponse, Blueprint, json, exceptions
 from sanic_ext import validate
 from sqlalchemy import select
@@ -12,7 +10,8 @@ from bank.config.config import DefaultConfig
 from bank.db.models import User
 from bank.schemas.auth.authentication import UserAuthenticationRequest, UserAuthenticationResponse
 from bank.schemas.auth.registration import UserRegistrationRequest, UserRegistrationResponse
-from bank.utils.user.user import authenticate_user, create_token, register_user, get_current_user
+from bank.utils.user.user import authenticate_user, create_token, register_user
+
 
 bp = Blueprint("user")
 
@@ -68,7 +67,7 @@ async def confirm(request: Request, token: str) -> HTTPResponse:
         username = serializer.loads(
             token,
             salt=DefaultConfig.SECURITY_PASSWORD_SALT,
-            max_age=DefaultConfig.CONFIRM_TOKEN_EXPIRE_MINUTES * 60 + 20,
+            max_age=DefaultConfig.CONFIRM_TOKEN_EXPIRE_MINUTES * 60,
         )
     except SignatureExpired:
         raise exceptions.NotFound("Page not found.")

@@ -1,12 +1,10 @@
-from pydantic import BaseModel, validator
-
-from bank.config.config import DefaultConfig
+from pydantic import BaseModel, AnyHttpUrl, Field
 
 
-class RegistrationUserForm(BaseModel):
-    login: str
-    password: str
+class UserRegistrationRequest(BaseModel):
+    username: str = Field(min_length=3, max_length=50)
+    password: str = Field(min_length=3, max_length=50)
 
-    @validator("password")
-    def validate_password(cls, password):
-        return DefaultConfig.PWD_CONTEXT.hash(password)
+
+class UserRegistrationResponse(BaseModel):
+    confirmed_url: AnyHttpUrl

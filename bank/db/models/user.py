@@ -1,9 +1,10 @@
 import enum
 
-from sqlalchemy import Column, TEXT, Enum
+from sqlalchemy import Column, TEXT, Enum, BOOLEAN
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
+from bank.config.config import DefaultConfig
 from bank.db import Base
 
 
@@ -22,24 +23,38 @@ class User(Base):
         server_default=func.gen_random_uuid(),
     )
 
-    login = Column(
-        "login",
+    username = Column(
+        "username",
         TEXT,
         unique=True,
         index=True,
         nullable=False,
     )
 
-    role = Column(
-        "role",
-        Enum(UserRoleEnum),
+    hash_password = Column(
+        "hash_password",
+        TEXT,
         nullable=False,
     )
 
-    def to_dict(self):
-        # TODO:
+    role = Column(
+        "role",
+        Enum(UserRoleEnum),
+        default=UserRoleEnum.USER,
+        nullable=False,
+    )
+
+    confirmed = Column(
+        "confirmed",
+        BOOLEAN,
+        default=False,
+        nullable=False,
+    )
+
+    def to_dict(self) -> dict:
         return {
             "id": str(self.id),
-            "login": self.login,
+            "login": self.username,
             "role": str(self.role.value),
+            "hash_password": str(self.hash_password)
         }

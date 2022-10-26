@@ -11,7 +11,7 @@ env:
 	echo "POSTGRES_PASSWORD=hackme" >> .env
 	echo "POSTGRES_HOST=localhost" >> .env
 	echo "POSTGRES_PORT=5432" >> .env
-	echo "APP_PORT=8000" >> .env
+	echo "APP_PORT=8001" >> .env
 	echo "APP_HOST=http://127.0.0.1" >> .env
 	echo "SECRET=app.secret" >> .env
 

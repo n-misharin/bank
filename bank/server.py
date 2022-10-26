@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from bank.config.config import DefaultConfig
 from bank.endpoints import user_blueprint
+from bank.utils.user.user import get_current_user
 
 
 def create_app() -> Sanic:

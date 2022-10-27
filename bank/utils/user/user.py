@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bank.config.config import DefaultConfig
 from bank.db.models import User
+from bank.db.models.user import UserRoleEnum
 from bank.utils.user.database import get_user, add_user
 
 
@@ -56,7 +57,7 @@ async def get_current_user(session: AsyncSession, token: str) -> User:
     if not is_valid or decode_result is None:
         raise exceptions.Unauthorized(f"Could not validate credentials.")
 
-    user_login = decode_result.get("username", None)
+    user_login = decode_result.get("sub", None)
 
     if user_login is None:
         raise exceptions.Unauthorized("Could not validate credentials.")
@@ -68,16 +69,25 @@ async def get_current_user(session: AsyncSession, token: str) -> User:
     return user
 
 
-def protected(wrapped):
+def protected(only: list[UserRoleEnum] = None):
+    is_for_all = only is None
+
     def decorator(func):
         @wraps(func)
         async def decorated_function(request: Request, *args, **kwargs):
-            is_correct, _ = check_token(request.token)
-            if is_correct:
-                return await func(request, *args, **kwargs)
+            cur_user: User = request.ctx.cur_user
+            if cur_user is None:
+                raise exceptions.Unauthorized("Auth required.")
+
+            is_valid, decode_data = check_token(request.token)
+            if is_valid and decode_data.get("sub", None) == cur_user.username:
+                if is_for_all or cur_user.role.value in [role.value for role in only]:
+                    return await func(request, *args, **kwargs)
+                else:
+                    raise exceptions.Forbidden("Access denied.")
 
             raise exceptions.Unauthorized("Auth required.")
 
         return decorated_function
 
-    return decorator(wrapped)
+    return decorator

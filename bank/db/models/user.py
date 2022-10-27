@@ -55,5 +55,6 @@ class User(Base):
             "id": str(self.id),
             "login": self.username,
             "role": str(self.role.value),
-            "hash_password": str(self.hash_password)
+            "hash_password": str(self.hash_password),
+            "confirmed": str(self.confirmed)
         }

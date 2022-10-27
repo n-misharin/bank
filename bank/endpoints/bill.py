@@ -14,7 +14,7 @@ bp = Blueprint("bill")
 
 
 @bp.get("/bills")
-@protected
+@protected()
 async def get_bills(request: Request) -> HTTPResponse:
     cur_user = request.ctx.cur_user
     session = request.ctx.session
@@ -25,11 +25,11 @@ async def get_bills(request: Request) -> HTTPResponse:
 
 
 @bp.get("/history/<bill_id:uuid>")
-@protected
+@protected()
 async def get_history(request: Request, bill_id: UUID) -> HTTPResponse:
     bills = await get_bills_by_user_id(request.ctx.session, request.ctx.cur_user.id)
     if bill_id not in [bill.id for bill in bills]:
-        raise exceptions.Forbidden("Processing denied.")
+        raise exceptions.Forbidden("Access denied.")
 
     result = await get_bill_history(request.ctx.session, bill_id)
 

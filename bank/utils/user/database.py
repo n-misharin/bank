@@ -37,3 +37,8 @@ async def confirm_user(session: AsyncSession, username: str) -> bool:
     await session.commit()
 
     return True
+
+
+async def get_all_users(session: AsyncSession) -> list[User]:
+    result = await session.scalars(select(User))
+    return [user for user in result.all()]

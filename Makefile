@@ -11,10 +11,6 @@ env:
 	echo "POSTGRES_PASSWORD=hackme" >> .env
 	echo "POSTGRES_HOST=localhost" >> .env
 	echo "POSTGRES_PORT=5432" >> .env
-	echo "SERVER_NAME=127.0.0.1:8080" >> .env
-	echo "APP_PORT=8000" >> .env
-	echo "APP_HOST=http://127.0.0.1" >> .env
-	echo "SECRET=app.secret" >> .env
 
 db:
 	docker-compose up -d
@@ -32,8 +28,8 @@ test:
 	poetry run python -m pytest --verbosity=2 --showlocals --log-level=DEBUG
 
 run:
-	#sanic $(APPLICATION_NAME).__main__:app
-	python $(APPLICATION_NAME).__main__.py
+	#sanic $(APPLICATION_NAME).server:app
+	python $(APPLICATION_NAME)/server.py
 
 revision:
 	cd $(APPLICATION_NAME)/db && alembic revision --autogenerate

@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bank.utils.biil.database import get_bill, add_amount, InsufficientFundsError, BaseInvalidDataError, \
     InvalidOwnerError, InvalidBillError
-from bank.utils.user.database import get_user_by_id
 
 
 async def can_write_off(session: AsyncSession, bill_id: UUID, amount: float) -> bool:

@@ -9,7 +9,7 @@ from bank.db.models import UserRoleEnum
 from bank.schemas.auth.authentication import UserAuthenticationRequest, UserAuthenticationResponse
 from bank.schemas.auth.registration import UserRegistrationRequest, UserRegistrationResponse
 from bank.utils.user.database import confirm_user, get_all_users
-from bank.utils.user.user import authenticate_user, create_token, register_user, protected
+from bank.utils.user.user import authenticate_user, create_token, register_user, protected, UserNotConfirmedError
 
 bp = Blueprint("user")
 
@@ -17,10 +17,12 @@ bp = Blueprint("user")
 @bp.post("/authentication")
 @validate(json=UserAuthenticationRequest)
 async def auth(request: Request, body: UserAuthenticationRequest) -> HTTPResponse:
-    # TODO: May be Base Auth?
-    user = await authenticate_user(request.ctx.session, body.username, body.password)
-    if not user:
-        raise exceptions.Unauthorized("Invalid username or password.")
+    try:
+        user = await authenticate_user(request.ctx.session, body.username, body.password)
+        if user is None:
+            raise exceptions.Unauthorized("Invalid username or password.")
+    except UserNotConfirmedError as exc:
+        raise exceptions.Unauthorized(str(exc))
 
     access_token_delta = datetime.timedelta(minutes=DefaultConfig.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_token({"sub": user.username}, access_token_delta)
@@ -42,7 +44,6 @@ async def registration(request: Request, body: UserRegistrationRequest) -> HTTPR
     serializer = URLSafeTimedSerializer(DefaultConfig.SECRET)
     confirmed_token = serializer.dumps(body.username, DefaultConfig.SECURITY_PASSWORD_SALT)
 
-    # TODO: beautiful url
     response = UserRegistrationResponse(
         confirmed_url=f"http://{request.host}/confirm/{confirmed_token}"
     )
@@ -53,7 +54,6 @@ async def registration(request: Request, body: UserRegistrationRequest) -> HTTPR
 async def confirm_registration(request: Request, token: str) -> HTTPResponse:
     serializer = URLSafeTimedSerializer(DefaultConfig.SECRET)
     try:
-        # TODO: username == user.username?
         username = serializer.loads(
             token,
             salt=DefaultConfig.SECURITY_PASSWORD_SALT,
@@ -84,7 +84,6 @@ async def get_users(request: Request) -> HTTPResponse:
 @bp.put("/confirm/user/<username:str>")
 @protected(only=[UserRoleEnum.USER])
 async def admin_confirm_user(request: Request, username: str) -> HTTPResponse:
-    # TODO: валидация лоинов пользователей при записи в базу (на допустимые символы)
     try:
         is_confirm = await confirm_user(request.ctx.session, username)
         if not is_confirm:

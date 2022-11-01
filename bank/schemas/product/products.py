@@ -13,7 +13,6 @@ class BuyProductResponse(BaseModel):
 class AddProductRequest(BaseModel):
     title: str = Field(max_length=50, min_length=2)
     description: str = Field(default="")
-    # TODO: что делать с копейками
     cost: float
 
 

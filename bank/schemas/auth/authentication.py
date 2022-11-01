@@ -1,11 +1,13 @@
 from pydantic import BaseModel, validator, Field
 
-from bank.config.default import DefaultConfig
-
 
 class UserAuthenticationRequest(BaseModel):
     username: str
     password: str
+
+    @validator("username")
+    def validate_username(cls, username: str):
+        return username.lower()
 
 
 class UserAuthenticationResponse(BaseModel):

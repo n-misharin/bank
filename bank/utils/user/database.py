@@ -32,7 +32,6 @@ async def confirm_user(session: AsyncSession, username: str) -> bool:
         return False
     query = update(User).where(User.id == user.id).values(confirmed=True)
 
-    # TODO: try .. except
     await session.execute(query)
     await session.commit()
 

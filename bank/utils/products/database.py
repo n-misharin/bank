@@ -32,7 +32,7 @@ async def insert_product(session: AsyncSession, data: AddProductRequest) -> Prod
     return product
 
 
-async def update_product(session: AsyncSession, data: UpdateProductRequest, product_id: UUID) -> Product:
+async def update_product(session: AsyncSession, data: UpdateProductRequest, product_id: UUID) -> None:
     update_values = dict()
     for key, val in data.dict().items():
         if val is not None:

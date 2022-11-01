@@ -62,3 +62,14 @@ async def get_bill_history(session: AsyncSession, bill_id: UUID) -> list[Transac
     query = select(Transaction).where(Transaction.bill_id == bill_id)
     result = await session.scalars(query)
     return [transaction for transaction in result.all()]
+
+
+async def add_bill(session: AsyncSession, user_id: UUID) -> Bill:
+    new_bill = Bill(balance=0, owner_id=user_id)
+    session.add(new_bill)
+    try:
+        await session.commit()
+        await session.refresh(new_bill)
+    except IntegrityError:
+        raise InvalidOwnerError("Invalid owner.")
+    return new_bill

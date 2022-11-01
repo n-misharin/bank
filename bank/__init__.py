@@ -1,5 +1,5 @@
-from bank.server import app
-
-__all__ = [
-    "app",
-]
+# from bank.__main__ import app
+#
+# __all__ = [
+#     "app",
+# ]

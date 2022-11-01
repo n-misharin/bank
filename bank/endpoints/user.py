@@ -4,12 +4,12 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from sanic import Request, HTTPResponse, Blueprint, json, exceptions
 from sanic_ext import validate
 
-from bank.config.config import DefaultConfig
+from bank.config.default import DefaultConfig
+from bank.db.models import UserRoleEnum
 from bank.schemas.auth.authentication import UserAuthenticationRequest, UserAuthenticationResponse
 from bank.schemas.auth.registration import UserRegistrationRequest, UserRegistrationResponse
-from bank.utils.user.database import confirm_user
-from bank.utils.user.user import authenticate_user, create_token, register_user
-
+from bank.utils.user.database import confirm_user, get_all_users
+from bank.utils.user.user import authenticate_user, create_token, register_user, protected
 
 bp = Blueprint("user")
 
@@ -50,7 +50,7 @@ async def registration(request: Request, body: UserRegistrationRequest) -> HTTPR
 
 
 @bp.get("/confirm/<token:str>", name="confirm")
-async def confirm(request: Request, token: str) -> HTTPResponse:
+async def confirm_registration(request: Request, token: str) -> HTTPResponse:
     serializer = URLSafeTimedSerializer(DefaultConfig.SECRET)
     try:
         # TODO: username == user.username?
@@ -69,4 +69,28 @@ async def confirm(request: Request, token: str) -> HTTPResponse:
 
     return json({
         "message": "Accept."
+    })
+
+
+@bp.get("/users")
+@protected(only=[UserRoleEnum.ADMIN])
+async def get_users(request: Request) -> HTTPResponse:
+    users = await get_all_users(request.ctx.session)
+    return json({
+        "items": [user.to_dict() for user in users]
+    })
+
+
+@bp.put("/confirm/user/<username:str>")
+@protected(only=[UserRoleEnum.USER])
+async def admin_confirm_user(request: Request, username: str) -> HTTPResponse:
+    # TODO: валидация лоинов пользователей при записи в базу (на допустимые символы)
+    try:
+        is_confirm = await confirm_user(request.ctx.session, username)
+        if not is_confirm:
+            raise Exception("Invalid username.")
+    except Exception:
+        raise exceptions.BadRequest("Invalid username")
+    return json({
+        "message": "Accepted."
     })

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator, Field
 
-from bank.config.config import DefaultConfig
+from bank.config.default import DefaultConfig
 
 
 class UserAuthenticationRequest(BaseModel):

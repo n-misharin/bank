@@ -5,7 +5,7 @@ import jwt
 from sanic import Request, exceptions
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bank.config.config import DefaultConfig
+from bank.config.default import DefaultConfig
 from bank.db.models import User
 from bank.db.models.user import UserRoleEnum
 from bank.utils.user.database import get_user, add_user
@@ -53,6 +53,7 @@ def check_token(token: str) -> tuple[bool, dict | None]:
 
 
 async def get_current_user(session: AsyncSession, token: str) -> User:
+    print("!!!!")
     is_valid, decode_result = check_token(token)
     if not is_valid or decode_result is None:
         raise exceptions.Unauthorized(f"Could not validate credentials.")

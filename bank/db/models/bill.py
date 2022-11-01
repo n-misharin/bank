@@ -28,7 +28,7 @@ class Bill(Base):
     owner_id = Column(
         "owner_id",
         UUID(as_uuid=True),
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"),
         nullable=False,
     )
 

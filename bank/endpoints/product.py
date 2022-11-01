@@ -17,12 +17,8 @@ bp = Blueprint("product")
 @protected()
 async def get_products(request: Request) -> HTTPResponse:
     products = await get_all_products(request.ctx.session)
-
     return json({
-        "items": [
-            product.to_dict()
-            for product in products
-        ]
+        "items": [product.to_dict() for product in products]
     })
 
 
@@ -37,13 +33,13 @@ async def buy(request: Request, body: BuyProductRequest) -> HTTPResponse:
         raise exceptions.BadRequest(str(exc))
     except BaseInvalidDataError as exc:
         raise exceptions.BadRequest(str(exc))
-    response = BuyProductResponse(message="Accepted.")
 
+    response = BuyProductResponse(message="Accepted.")
     return json(response.dict())
 
 
 @bp.post("/product")
-@protected(only=[UserRoleEnum.USER])
+@protected(only=[UserRoleEnum.ADMIN])
 @validate(json=AddProductRequest)
 async def add_product(request: Request, body: AddProductRequest) -> HTTPResponse:
     try:
@@ -59,7 +55,7 @@ async def add_product(request: Request, body: AddProductRequest) -> HTTPResponse
 
 @bp.put("/product/<product_id:uuid>")
 @validate(json=UpdateProductRequest)
-@protected(only=[UserRoleEnum.USER])
+@protected(only=[UserRoleEnum.ADMIN])
 async def put_product(request: Request, product_id: UUID, body: UpdateProductRequest) -> HTTPResponse:
     try:
         await update_product(request.ctx.session, body, product_id)

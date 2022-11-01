@@ -4,10 +4,10 @@ from Crypto.Hash import SHA1
 from sanic import Request, HTTPResponse, Blueprint, json, exceptions
 from sanic_ext import validate
 
-from bank.config.config import DefaultConfig
+from bank.config.default import DefaultConfig
 from bank.schemas.bill.bill import AddAmountRequest
 from bank.utils.biil.bill import credit_to
-from bank.utils.biil.database import get_bills_by_user_id, BaseInvalidDataError, get_bill_history
+from bank.utils.biil.database import get_bills_by_user_id, BaseInvalidDataError, get_bill_history, add_bill
 from bank.utils.user.user import protected
 
 bp = Blueprint("bill")
@@ -21,6 +21,20 @@ async def get_bills(request: Request) -> HTTPResponse:
     bills = await get_bills_by_user_id(session, cur_user.id)
     return json({
         "items": [bill.to_dict() for bill in bills],
+    })
+
+
+@bp.post("/bill")
+@protected()
+async def new_bill(request: Request) -> HTTPResponse:
+    try:
+        bill = await add_bill(request.ctx.session, request.ctx.cur_user)
+    except BaseInvalidDataError as exc:
+        raise exceptions.BadRequest(str(exc))
+
+    return json({
+        "message": "Accepted.",
+        "bill": str(bill.to_dict())
     })
 
 

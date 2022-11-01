@@ -28,7 +28,7 @@ async def get_bills(request: Request) -> HTTPResponse:
 @protected()
 async def new_bill(request: Request) -> HTTPResponse:
     try:
-        bill = await add_bill(request.ctx.session, request.ctx.cur_user)
+        bill = await add_bill(request.ctx.session, request.ctx.cur_user.id)
     except BaseInvalidDataError as exc:
         raise exceptions.BadRequest(str(exc))
 
@@ -58,10 +58,11 @@ async def add_amount(request: Request, body: AddAmountRequest) -> HTTPResponse:
     signature = SHA1.new(
         f'{DefaultConfig.SECRET}:{body.transaction_id}:{body.user_id}:{body.bill_id}:{body.amount}'.encode()
     )
+
     if signature.hexdigest() != body.signature:
         raise exceptions.BadRequest("Invalid data.")
     try:
-        await credit_to(request.ctx.session, body.bill_id, body.user_id, body.amount)
+        await credit_to(request.ctx.session, body)
     except BaseInvalidDataError as exc:
         raise exceptions.BadRequest(str(exc))
 

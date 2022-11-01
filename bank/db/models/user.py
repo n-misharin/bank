@@ -2,6 +2,7 @@ import enum
 
 from sqlalchemy import Column, String, Enum, BOOLEAN, TEXT
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from bank.db import Base
@@ -50,11 +51,15 @@ class User(Base):
         nullable=False,
     )
 
+    bills = relationship("Bill", back_populates="owner", lazy="selectin")
+
     def to_dict(self) -> dict:
+
         return {
             "id": str(self.id),
             "login": self.username,
             "role": str(self.role.value),
             "hash_password": str(self.hash_password),
-            "confirmed": str(self.confirmed)
+            "confirmed": str(self.confirmed),
+            "bills": [bill.to_dict() for bill in self.bills]
         }

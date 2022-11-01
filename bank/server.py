@@ -56,4 +56,5 @@ if __name__ == "__main__":
         port=app_config.APP_PORT,
         dev=app_config.DEBUG,
         debug=app_config.DEBUG,
+        # workers=2,
     )

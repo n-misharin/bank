@@ -64,8 +64,11 @@ async def get_bill_history(session: AsyncSession, bill_id: UUID) -> list[Transac
     return [transaction for transaction in result.all()]
 
 
-async def add_bill(session: AsyncSession, user_id: UUID) -> Bill:
+async def add_bill(session: AsyncSession, user_id: UUID, bill_id: UUID | None = None) -> Bill:
     new_bill = Bill(balance=0, owner_id=user_id)
+    if bill_id is not None:
+        new_bill.id = bill_id
+
     session.add(new_bill)
     try:
         await session.commit()

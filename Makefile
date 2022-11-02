@@ -18,9 +18,6 @@ db:
 init:
 	make env && make db
 
-open_db:
-	docker exec -it $(DB_CONTAINER_NAME) psql -d $(POSTGRES_DB) -U $(POSTGRES_USER)
-
 lint:
 	poetry run python -m pylint $(APPLICATION_NAME)
 
@@ -36,3 +33,12 @@ revision:
 
 migrate:
 	cd $(APPLICATION_NAME)/db && alembic upgrade head
+
+open_db:
+	docker exec -it $(DB_CONTAINER_NAME) psql -d $(POSTGRES_DB) -U $(POSTGRES_USER)
+
+upload_db:
+	docker exec $(DB_CONTAINER_NAME) pg_dumpall -c -U user > dump.sql
+
+restore_db:
+	docker exec -i $(DB_CONTAINER_NAME) psql -d $(POSTGRES_DB) -U $(POSTGRES_USER) < dump.sql
